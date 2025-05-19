@@ -5,6 +5,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func ErrCheckIsTxСoncurrentExec(err error) bool {
@@ -43,4 +45,36 @@ func ErrConvertPgxToLogic(err error) (bool, error) {
 		}
 	}
 	return false, err
+}
+
+func ErrConvertGRPCToLogic(err error) (bool, error) {
+	st, ok := status.FromError(err)
+	if !ok {
+		return false, err
+	}
+
+	switch st.Code() {
+	case codes.InvalidArgument:
+		return true, NewErrorFrom(ErrBadRequest).Wrap(err)
+	case codes.Unauthenticated:
+		return true, NewErrorFrom(ErrUnauthorized).Wrap(err)
+	case codes.PermissionDenied:
+		return true, NewErrorFrom(ErrForbidden).Wrap(err)
+	case codes.NotFound:
+		return true, NewErrorFrom(ErrNotFound).Wrap(err)
+	case codes.AlreadyExists, codes.Aborted:
+		return true, NewErrorFrom(ErrConflict).Wrap(err)
+	case codes.FailedPrecondition, codes.OutOfRange:
+		return true, NewErrorFrom(ErrUnprocessableEntity).Wrap(err)
+	case codes.Unimplemented, codes.DataLoss:
+		return true, NewErrorFrom(ErrNotAcceptable).Wrap(err)
+	case codes.Unavailable:
+		return true, NewErrorFrom(ErrServiceUnavailable).Wrap(err)
+	case codes.Internal, codes.Unknown:
+		return true, NewErrorFrom(ErrInternal).Wrap(err)
+	case codes.DeadlineExceeded, codes.ResourceExhausted, codes.Canceled:
+		return true, NewErrorFrom(ErrGRPCCanceled).Wrap(err)
+	default:
+		return true, NewErrorFrom(ErrInternal).Wrap(err)
+	}
 }

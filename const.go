@@ -22,4 +22,7 @@ var (
 	ErrStoreNotNullViolation    = NewErrorFrom(ErrBadRequest).Lock()
 	ErrStoreRestrictViolation   = NewErrorFrom(ErrBadRequest).Lock()
 	ErrStoreIntegrityViolation  = NewErrorFrom(ErrBadRequest).Lock()
+
+	// Ошибки при работе с grpc
+	ErrGRPCCanceled = NewErrorFrom(ErrServiceUnavailable).Lock()
 )
