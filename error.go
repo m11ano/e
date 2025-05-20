@@ -1,6 +1,9 @@
 package e
 
-import "google.golang.org/grpc/codes"
+import (
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
 type LogicError struct {
 	onlyRead bool
@@ -12,9 +15,6 @@ type LogicError struct {
 }
 
 func (e *LogicError) Error() string {
-	if len(e.details) > 0 {
-		return e.message
-	}
 	return e.message
 }
 
@@ -141,4 +141,8 @@ func (e *LogicError) GetGRPCCode() codes.Code {
 	default:
 		return codes.Unknown
 	}
+}
+
+func (e *LogicError) AsGRPCError() error {
+	return status.Error(e.GetGRPCCode(), e.Error())
 }

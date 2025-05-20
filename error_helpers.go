@@ -48,6 +48,11 @@ func ErrConvertPgxToLogic(err error) (bool, error) {
 }
 
 func ErrConvertGRPCToLogic(err error) (bool, error) {
+
+	if err == nil {
+		return false, nil
+	}
+
 	st, ok := status.FromError(err)
 	if !ok {
 		return false, err
