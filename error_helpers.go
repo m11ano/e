@@ -60,26 +60,26 @@ func ErrConvertGRPCToLogic(err error) (bool, error) {
 
 	switch st.Code() {
 	case codes.InvalidArgument:
-		return true, NewErrorFrom(ErrBadRequest).Wrap(err)
+		return true, NewErrorFrom(ErrBadRequest).Wrap(err).SetMessage(st.Message())
 	case codes.Unauthenticated:
-		return true, NewErrorFrom(ErrUnauthorized).Wrap(err)
+		return true, NewErrorFrom(ErrUnauthorized).Wrap(err).SetMessage(st.Message())
 	case codes.PermissionDenied:
-		return true, NewErrorFrom(ErrForbidden).Wrap(err)
+		return true, NewErrorFrom(ErrForbidden).Wrap(err).SetMessage(st.Message())
 	case codes.NotFound:
-		return true, NewErrorFrom(ErrNotFound).Wrap(err)
+		return true, NewErrorFrom(ErrNotFound).Wrap(err).SetMessage(st.Message())
 	case codes.AlreadyExists, codes.Aborted:
-		return true, NewErrorFrom(ErrConflict).Wrap(err)
+		return true, NewErrorFrom(ErrConflict).Wrap(err).SetMessage(st.Message())
 	case codes.FailedPrecondition, codes.OutOfRange:
-		return true, NewErrorFrom(ErrUnprocessableEntity).Wrap(err)
+		return true, NewErrorFrom(ErrUnprocessableEntity).Wrap(err).SetMessage(st.Message())
 	case codes.Unimplemented, codes.DataLoss:
-		return true, NewErrorFrom(ErrNotAcceptable).Wrap(err)
+		return true, NewErrorFrom(ErrNotAcceptable).Wrap(err).SetMessage(st.Message())
 	case codes.Unavailable:
-		return true, NewErrorFrom(ErrServiceUnavailable).Wrap(err)
+		return true, NewErrorFrom(ErrServiceUnavailable).Wrap(err).SetMessage(st.Message())
 	case codes.Internal, codes.Unknown:
-		return true, NewErrorFrom(ErrInternal).Wrap(err)
+		return true, NewErrorFrom(ErrInternal).Wrap(err).SetMessage(st.Message())
 	case codes.DeadlineExceeded, codes.ResourceExhausted, codes.Canceled:
-		return true, NewErrorFrom(ErrGRPCCanceled).Wrap(err)
+		return true, NewErrorFrom(ErrGRPCCanceled).Wrap(err).SetMessage(st.Message())
 	default:
-		return true, NewErrorFrom(ErrInternal).Wrap(err)
+		return true, NewErrorFrom(ErrInternal).Wrap(err).SetMessage("unknown internal error")
 	}
 }
